@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+    <body>
+        <input type="text" id="time">
+        <input type="text" id="resolution">
+        <input type="text" id="velocity">
+        <input type="text" id="angle">
+        <input type="text" id="area">
+        <input type="text" id="drag_coefficient">
+        <input type="text" id="mass">
+        <button type="button" onclick="submit()">submit</button>
+        <figure class="circle" id="circle"></figure>
+    </body>
+
+    <style>
+        .circle {
+            position: relative;
+            top: 800px;
+            left: 0px;
+            display: block;
+            background: black;
+            border-radius: 50%;
+            height: 100px;
+            width: 100px;
+            margin: 0;
+        }
+    </style>
+
+    <script>
+        let time;
+        let resolultion;
+        let velocity;
+        let angle;
+        let area;
+        let drag_coefficient;
+        let mass;
+        let xPosition;
+        let yPosition;
+        let shift;
+        let maxLength;
+        const element = document.getElementById('circle');
+        let start, previousTimeStamp;
+        let done = false
+
+        function submit() {
+            time = parseFloat(document.getElementById("time").value);
+            resolultion = parseInt(document.getElementById("resolution").value);
+            velocity = parseFloat(document.getElementById("velocity").value);
+            angle = parseFloat(document.getElementById("angle").value);
+            area = parseFloat(document.getElementById("area").value);
+            drag_coefficient = parseFloat(document.getElementById("drag_coefficient").value);
+            mass = parseFloat(document.getElementById("mass").value);
+            Module.Simulate(time, resolultion, velocity, angle, area, drag_coefficient, mass);
+            shift = 800/Math.max(Module.getMaxHieght(), Module.getMaxLength()); 
+            maxLength = Module.getMaxLength();
+            window.requestAnimationFrame(simulate);
+        }
+
+        function simulate(timestamp) {
+            if (start === undefined) {
+                start = timestamp;
+                }
+            const elapsed = timestamp - start;
+
+            if (previousTimeStamp !== timestamp) {
+                // Math.min() is used here to make sure the element stops at exactly 200px
+                xPosition = Module.getX(parseInt(elapsed/1000.0*60))*shift;
+                yPosition = Module.getY(parseInt(elapsed/1000.0*60))*shift;
+                element.style.transform = 'translate(' + xPosition + 'px, ' + '-'+yPosition + 'px)';
+                if (maxLength*shift - xPosition == 0) {
+                    console.log("done");
+                    done = true;
+                }
+            }
+
+            if (elapsed < time*1000) { // Stop the animation after 2 seconds
+                previousTimeStamp = timestamp
+                !done && window.requestAnimationFrame(simulate);
+            }
+        }
+    </script>
+    <script src="ProjectileMotion.js"></script>
+</html>
