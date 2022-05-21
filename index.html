@@ -38,11 +38,17 @@
         let yPosition;
         let shift;
         let maxLength;
+
+        let instance;
         const element = document.getElementById('circle');
         let start, previousTimeStamp;
         let done = false
 
         function submit() {
+            done = false;
+            start = undefined;
+            previousTimeStamp = undefined;
+
             time = parseFloat(document.getElementById("time").value);
             resolultion = parseInt(document.getElementById("resolution").value);
             velocity = parseFloat(document.getElementById("velocity").value);
@@ -50,10 +56,14 @@
             area = parseFloat(document.getElementById("area").value);
             drag_coefficient = parseFloat(document.getElementById("drag_coefficient").value);
             mass = parseFloat(document.getElementById("mass").value);
-            Module.Simulate(time, resolultion, velocity, angle, area, drag_coefficient, mass);
-            shift = 800/Math.max(Module.getMaxHieght(), Module.getMaxLength()); 
-            maxLength = Module.getMaxLength();
+
+            instance = new Module.Simulator(time, resolultion, velocity, angle, area, drag_coefficient, mass);
+            console.log(instance.getMaxHieght());
+            console.log(instance.getMaxLength());
+            shift = 800/Math.max(instance.getMaxHieght(), instance.getMaxLength()); 
+            maxLength = instance.getMaxLength();
             window.requestAnimationFrame(simulate);
+            console.log("finished");
         }
 
         function simulate(timestamp) {
@@ -63,17 +73,17 @@
             const elapsed = timestamp - start;
 
             if (previousTimeStamp !== timestamp) {
-                // Math.min() is used here to make sure the element stops at exactly 200px
-                xPosition = Module.getX(parseInt(elapsed/1000.0*60))*shift;
-                yPosition = Module.getY(parseInt(elapsed/1000.0*60))*shift;
+                xPosition = instance.getX(parseInt(elapsed/1000.0*60))*shift;
+                yPosition = instance.getY(parseInt(elapsed/1000.0*60))*shift;
                 element.style.transform = 'translate(' + xPosition + 'px, ' + '-'+yPosition + 'px)';
-                if (maxLength*shift - xPosition == 0) {
+                if (maxLength*shift - xPosition == 0 || yPosition<0) {
+                    instance.delete();
                     console.log("done");
                     done = true;
                 }
             }
 
-            if (elapsed < time*1000) { // Stop the animation after 2 seconds
+            if (elapsed < time*1000) {
                 previousTimeStamp = timestamp
                 !done && window.requestAnimationFrame(simulate);
             }
