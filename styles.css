@@ -1,0 +1,25 @@
+.circle {
+    position: relative;
+    top: 60vh;
+    left: 0px;
+    display: block;
+    background: black;
+    border-radius: 50%;
+    height: 100px;
+    width: 100px;
+    margin: 0;
+}
+
+.description {
+    display: inline;
+}
+
+.info {
+    display: block;
+    margin-right: 65vw;
+    border: 3px solid #ffffff;
+}
+
+.input {
+    float: right;
+}
